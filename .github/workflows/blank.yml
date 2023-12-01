@@ -13,14 +13,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '14'
-
-    - name: Install dependencies
-      run: npm install
-
     - name: Call API and store response in JSON file
       run: |
         # Replace the API_URL with your actual API endpoint
@@ -40,5 +32,7 @@ jobs:
         git config --global user.name "GitHub Actions"
         TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
         git add $GITHUB_WORKSPACE/response.json
+        git status  # Optional: Check the status before committing
+        git diff --staged  # Optional: See the changes before committing
         git commit -m "Update response.json at $TIMESTAMP"
         git push
