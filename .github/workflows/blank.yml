@@ -3,6 +3,7 @@ name: API Cron Job
 on:
   schedule:
     - cron: '0 * * * *'  # Run every hour
+  workflow_dispatch:  # Allow manual triggers
 
 jobs:
   api-job:
