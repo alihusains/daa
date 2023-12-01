@@ -1,0 +1,43 @@
+name: API Cron Job
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Run every hour
+
+jobs:
+  api-job:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Call API and store response in JSON file
+      run: |
+        # Replace the API_URL with your actual API endpoint
+        API_URL="https://duas-and-aamal.vercel.app/duas/"
+        RESPONSE=$(curl -s -w "%{http_code}" "$API_URL")
+        STATUS_CODE=${RESPONSE: -3}  # Extract last 3 characters (HTTP status code)
+
+        if [ "$STATUS_CODE" = "200" ]; then
+          echo "${RESPONSE::-3}" > response.json  # Remove last 3 characters and store in response.json
+        else
+          echo "Non-200 status code received: $STATUS_CODE. Skipping response.json update."
+        fi
+
+    - name: Commit and push changes with timestamp
+      run: |
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+        TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
+        git add response.json
+        git commit -m "Update response.json at $TIMESTAMP"
+        git push
