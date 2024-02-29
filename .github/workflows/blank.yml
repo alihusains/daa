@@ -16,12 +16,25 @@ jobs:
     - name: Call API and store response in JSON file
       run: |
         # Replace the API_URL with your actual API endpoint
-        API_URL="https://script.google.com/macros/s/AKfycbyrh3wEuvmOlCu2iZaA393m8WMUZHc1555RqtQp6dg4GCy_xTA936tvhydSt864VblCJg/exec?sheet=raw&action=read"
+        API_URL="https://script.google.com/macros/s/AKfycbyrh3wEuvmOlCu2iZaA393m8WMUZHc1555RqtQp6dg4GCy_xTA936tvhydSt864VblCJg/exec?sheet=v2&action=read"
         RESPONSE=$(curl -s -w "%{http_code}" "$API_URL")
         STATUS_CODE=${RESPONSE: -3}  # Extract last 3 characters (HTTP status code)
 
         if [ "$STATUS_CODE" = "200" ]; then
           echo "${RESPONSE::-3}" > $GITHUB_WORKSPACE/response.json  # Store in the workspace directory
+          
+        else
+          echo "Non-200 status code received: $STATUS_CODE. Skipping response.json update."
+        fi
+    - name: Call Fateha API and store response in JSON FILE 
+      run: |
+        # Replace the API_URL with your actual API endpoint
+        FATEHA_URL="https://script.google.com/macros/s/AKfycbxR8ax8WVwR1lnJvaqvSRTxYIbEsAqfpXm5Oq_vRcgh9tPsBikZ67pieeE_-VFg-TRf/exec?sheet=marhoom&action=read"
+        RESPONSE=$(curl -s -w "%{http_code}" "$FATEHA_URL")
+        STATUS_CODE=${RESPONSE: -3}  # Extract last 3 characters (HTTP status code)
+
+        if [ "$STATUS_CODE" = "200" ]; then
+          echo "${RESPONSE::-3}" > $GITHUB_WORKSPACE/fateha.json  # Store in the workspace directory
           
         else
           echo "Non-200 status code received: $STATUS_CODE. Skipping response.json update."
@@ -33,7 +46,8 @@ jobs:
         git config --global user.name "GitHub Actions"
         TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
         git add $GITHUB_WORKSPACE/response.json
+        git add $GITHUB_WORKSPACE/fateha.json
         git status  # Optional: Check the status before committing
         git diff --staged  # Optional: See the changes before committing
-        git commit -m "Update response.json at $TIMESTAMP"
+        git commit -m "Updated data at at $TIMESTAMP"
         git push
