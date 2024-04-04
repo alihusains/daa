@@ -10,67 +10,67 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Git
-      run: |
-        git config user.email "github-actions@github.com"
-        git config user.name "GitHub Actions"
-        
-    - name: Call API and store response in JSON file
-      run: |
-        # Replace the API_URL with your actual API endpoint
-        API_URL="https://script.google.com/macros/s/AKfycbyrh3wEuvmOlCu2iZaA393m8WMUZHc1555RqtQp6dg4GCy_xTA936tvhydSt864VblCJg/exec?sheet=v2&action=read"
-         FILE_FORMAT="response.json"
-         FILE_PATH="${GITHUB_WORKSPACE}/${FILE_FORMAT}"
+      - name: Set up Git
+        run: |
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+          
+      - name: Call API and store response in JSON file
+        run: |
+          # Replace the API_URL with your actual API endpoint
+          API_URL="https://script.google.com/macros/s/AKfycbyrh3wEuvmOlCu2iZaA393m8WMUZHc1555RqtQp6dg4GCy_xTA936tvhydSt864VblCJg/exec?sheet=v2&action=read"
+          FILE_FORMAT="response.json"
+          FILE_PATH="${GITHUB_WORKSPACE}/${FILE_FORMAT}"
 
           # Make API call and save response to a temporary file
-        TEMP_FILE=$(mktemp)
-        curl -sL "${API_URL}" > "${TEMP_FILE}"
+          TEMP_FILE=$(mktemp)
+          curl -sL "${API_URL}" > "${TEMP_FILE}"
 
-         # Replace the contents of response.json with the temporary file
-        mv "${TEMP_FILE}" "${FILE_PATH}"
-
-
-    - name: Call Fateha API and store response in JSON FILE 
-      run: |
-        # Replace the API_URL with your actual API endpoint
-        FATEHA_URL="https://script.google.com/macros/s/AKfycbzqd8yHDAKJ_lG5XTl-lqIa0yU43QDC_tdATiUogULoRbxd0dEnJXUKf2N-tO5kLnT2/exec?sheet=marhoom&action=read"
-        FILE_FORMAT="fateha.json"
-         FILE_PATH="${GITHUB_WORKSPACE}/${FILE_FORMAT}"
-        # Make API call and save response to a temporary file
-        FATEHA_FILE=$(mktemp)
-        curl -sL "${FATEHA_URL}" > "${FATEHA_FILE}"
-
-         # Replace the contents of response.json with the temporary file
-        mv "${FATEHA_FILE}" "${FILE_PATH}"
+          # Replace the contents of response.json with the temporary file
+          mv "${TEMP_FILE}" "${FILE_PATH}"
 
 
-    - name: Commit and push changes with timestamp
-      run: |
-        git config --global user.email "actions@github.com"
-        git config --global user.name "GitHub Actions"
-       
-        # TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
-        TIMESTAMP=$(TZ="GMT+4" date +"%Y-%m-%d %H:%M:%S")
+      - name: Call Fateha API and store response in JSON FILE 
+        run: |
+          # Replace the API_URL with your actual API endpoint
+          FATEHA_URL="https://script.google.com/macros/s/AKfycbzqd8yHDAKJ_lG5XTl-lqIa0yU43QDC_tdATiUogULoRbxd0dEnJXUKf2N-tO5kLnT2/exec?sheet=marhoom&action=read"
+          FILE_FORMAT="fateha.json"
+          FILE_PATH="${GITHUB_WORKSPACE}/${FILE_FORMAT}"
+          
+          # Make API call and save response to a temporary file
+          FATEHA_FILE=$(mktemp)
+          curl -sL "${FATEHA_URL}" > "${FATEHA_FILE}"
 
-        # Check if there are changes to response.json
-        if [[ $(git diff --exit-code response.json) ]]; then
-          git add response.json
-        fi
+          # Replace the contents of fateha.json with the temporary file
+          mv "${FATEHA_FILE}" "${FILE_PATH}"
 
-        # Check if there are changes to fateha.json
-        if [[ $(git diff --exit-code fateha.json) ]]; then
-          git add fateha.json
-        fi
 
-        # Check if there are changes to commit
-        if ! git diff --staged --quiet; then
-          git status  # Optional: Check the status before committing
-          git diff --staged  # Optional: See the changes before committing
-          git commit -m "Updated data at $TIMESTAMP"
-          git push
-        else
-          echo "No changes to commit."
-        fi
+      - name: Commit and push changes with timestamp
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+         
+          TIMESTAMP=$(TZ="Asia/Dubai" date +"%Y-%m-%d %H:%M:%S")
+
+          # Check if there are changes to response.json
+          if [[ $(git diff --exit-code response.json) ]]; then
+            git add response.json
+          fi
+
+          # Check if there are changes to fateha.json
+          if [[ $(git diff --exit-code fateha.json) ]]; then
+            git add fateha.json
+          fi
+
+          # Check if there are changes to commit
+          if ! git diff --staged --quiet; then
+            git status  # Optional: Check the status before committing
+            git diff --staged  # Optional: See the changes before committing
+            git commit -m "Updated data at $TIMESTAMP"
+            git push
+          else
+            echo "No changes to commit."
+          fi
