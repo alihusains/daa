@@ -26,6 +26,7 @@ jobs:
         else
           echo "Non-200 status code received: $STATUS_CODE. Skipping response.json update."
         fi
+
     - name: Call Fateha API and store response in JSON FILE 
       run: |
         # Replace the API_URL with your actual API endpoint
@@ -45,9 +46,23 @@ jobs:
         git config --global user.email "actions@github.com"
         git config --global user.name "GitHub Actions"
         TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
-        git add $GITHUB_WORKSPACE/response.json
-        git add $GITHUB_WORKSPACE/fateha.json
-        git status  # Optional: Check the status before committing
-        git diff --staged  # Optional: See the changes before committing
-        git commit -m "Updated data at at $TIMESTAMP"
-        git push
+
+        # Check if there are changes to response.json
+        if [[ $(git diff --exit-code $GITHUB_WORKSPACE/response.json) ]]; then
+          git add $GITHUB_WORKSPACE/response.json
+        fi
+
+        # Check if there are changes to fateha.json
+        if [[ $(git diff --exit-code $GITHUB_WORKSPACE/fateha.json) ]]; then
+          git add $GITHUB_WORKSPACE/fateha.json
+        fi
+
+        # Check if there are changes to commit
+        if ! git diff --staged --quiet; then
+          git status  # Optional: Check the status before committing
+          git diff --staged  # Optional: See the changes before committing
+          git commit -m "Updated data at $TIMESTAMP"
+          git push
+        else
+          echo "No changes to commit."
+        fi
