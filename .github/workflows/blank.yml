@@ -29,7 +29,7 @@ jobs:
     - name: Call Fateha API and store response in JSON FILE 
       run: |
         # Replace the API_URL with your actual API endpoint
-        FATEHA_URL="https://script.google.com/macros/s/AKfycbxR8ax8WVwR1lnJvaqvSRTxYIbEsAqfpXm5Oq_vRcgh9tPsBikZ67pieeE_-VFg-TRf/exec?sheet=marhoom&action=read"
+        FATEHA_URL="https://script.google.com/macros/s/AKfycbzqd8yHDAKJ_lG5XTl-lqIa0yU43QDC_tdATiUogULoRbxd0dEnJXUKf2N-tO5kLnT2/exec?sheet=marhoom&action=read"
         RESPONSE=$(curl -s -w "%{http_code}" "$FATEHA_URL")
         STATUS_CODE=${RESPONSE: -3}  # Extract last 3 characters (HTTP status code)
 
