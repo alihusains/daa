@@ -21,7 +21,7 @@ jobs:
         STATUS_CODE=${RESPONSE: -3}  # Extract last 3 characters (HTTP status code)
 
         if [ "$STATUS_CODE" = "200" ]; then
-          echo "${RESPONSE:0:-3}" > $GITHUB_WORKSPACE/response.json  # Store in the workspace directory
+          echo "${RESPONSE:0:-3}" > response.json  # Store in the workspace directory
           
         else
           echo "Non-200 status code received: $STATUS_CODE. Skipping response.json update."
@@ -35,7 +35,7 @@ jobs:
         STATUS_CODE=${RESPONSE: -3}  # Extract last 3 characters (HTTP status code)
 
         if [ "$STATUS_CODE" = "200" ]; then
-          echo "${RESPONSE:0:-3}" > $GITHUB_WORKSPACE/fateha.json  # Store in the workspace directory
+          echo "${RESPONSE:0:-3}" > fateha.json  # Store in the workspace directory
           
         else
           echo "Non-200 status code received: $STATUS_CODE. Skipping fateha.json update."
@@ -43,18 +43,19 @@ jobs:
 
     - name: Commit and push changes with timestamp
       run: |
+        cd daa  # Change directory to your repository
         git config --global user.email "actions@github.com"
         git config --global user.name "GitHub Actions"
         TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 
         # Check if there are changes to response.json
-        if [[ $(git diff --exit-code $GITHUB_WORKSPACE/response.json) ]]; then
-          git add $GITHUB_WORKSPACE/response.json
+        if [[ $(git diff --exit-code response.json) ]]; then
+          git add response.json
         fi
 
         # Check if there are changes to fateha.json
-        if [[ $(git diff --exit-code $GITHUB_WORKSPACE/fateha.json) ]]; then
-          git add $GITHUB_WORKSPACE/fateha.json
+        if [[ $(git diff --exit-code fateha.json) ]]; then
+          git add fateha.json
         fi
 
         # Check if there are changes to commit
