@@ -41,7 +41,7 @@ jobs:
          FILE_PATH="${GITHUB_WORKSPACE}/${FILE_FORMAT}"
         # Make API call and save response to a temporary file
         FATEHA_FILE=$(mktemp)
-        curl -sL "${API_URL}" > "${FATEHA_FILE}"
+        curl -sL "${FATEHA_URL}" > "${FATEHA_FILE}"
 
          # Replace the contents of response.json with the temporary file
         mv "${FATEHA_FILE}" "${FILE_PATH}"
