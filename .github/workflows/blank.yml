@@ -13,33 +13,30 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Set up Git
+      run: |
+        git config user.email "github-actions@github.com"
+        git config user.name "GitHub Actions"
+        
     - name: Call API and store response in JSON file
       run: |
         # Replace the API_URL with your actual API endpoint
         API_URL="https://script.google.com/macros/s/AKfycbyrh3wEuvmOlCu2iZaA393m8WMUZHc1555RqtQp6dg4GCy_xTA936tvhydSt864VblCJg/exec?sheet=v2&action=read"
-        RESPONSE=$(curl -s -w "%{http_code}" "$API_URL")
-        STATUS_CODE=${RESPONSE: -3}  # Extract last 3 characters (HTTP status code)
+         FILE_FORMAT="response.json"
+         FILE_PATH="${GITHUB_WORKSPACE}/${FILE_FORMAT}"
+         # Make API call and save response to file
+        curl -sL "${API_URL}" > "${FILE_PATH}"
 
-        if [ "$STATUS_CODE" = "200" ]; then
-          echo "${RESPONSE:0:-3}" > ${GITHUB_WORKSPACE}/response.json  # Store in the workspace directory
-          
-        else
-          echo "Non-200 status code received: $STATUS_CODE. Skipping response.json update."
-        fi
 
     - name: Call Fateha API and store response in JSON FILE 
       run: |
         # Replace the API_URL with your actual API endpoint
         FATEHA_URL="https://script.google.com/macros/s/AKfycbzqd8yHDAKJ_lG5XTl-lqIa0yU43QDC_tdATiUogULoRbxd0dEnJXUKf2N-tO5kLnT2/exec?sheet=marhoom&action=read"
-        RESPONSE=$(curl -s -w "%{http_code}" "$FATEHA_URL")
-        STATUS_CODE=${RESPONSE: -3}  # Extract last 3 characters (HTTP status code)
-
-        if [ "$STATUS_CODE" = "200" ]; then
-          echo "${RESPONSE:0:-3}" > ${GITHUB_WORKSPACE}/fateha.json  # Store in the workspace directory
-          
-        else
-          echo "Non-200 status code received: $STATUS_CODE. Skipping fateha.json update."
-        fi
+        FILE_FORMAT="fateha.json"
+         FILE_PATH="${GITHUB_WORKSPACE}/${FILE_FORMAT}"
+         # Make API call and save response to file
+        curl -sL "${FATEHA_URL}" > "${FILE_PATH}"
+        
 
     - name: Commit and push changes with timestamp
       run: |
