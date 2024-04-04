@@ -21,7 +21,7 @@ jobs:
         STATUS_CODE=${RESPONSE: -3}  # Extract last 3 characters (HTTP status code)
 
         if [ "$STATUS_CODE" = "200" ]; then
-          echo "${RESPONSE:0:-3}" > response.json  # Store in the workspace directory
+          echo "${RESPONSE:0:-3}" > ${GITHUB_WORKSPACE}/response.json  # Store in the workspace directory
           
         else
           echo "Non-200 status code received: $STATUS_CODE. Skipping response.json update."
@@ -35,7 +35,7 @@ jobs:
         STATUS_CODE=${RESPONSE: -3}  # Extract last 3 characters (HTTP status code)
 
         if [ "$STATUS_CODE" = "200" ]; then
-          echo "${RESPONSE:0:-3}" > fateha.json  # Store in the workspace directory
+          echo "${RESPONSE:0:-3}" > ${GITHUB_WORKSPACE}/fateha.json  # Store in the workspace directory
           
         else
           echo "Non-200 status code received: $STATUS_CODE. Skipping fateha.json update."
