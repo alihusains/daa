@@ -47,6 +47,20 @@ jobs:
           # Replace the contents of fateha.json with the temporary file
           mv "${FATEHA_FILE}" "${FILE_PATH}"
 
+      - name: Call Channels API and store response in JSON FILE 
+        run: |
+          # Replace the API_URL with your actual API endpoint
+          CHANNELS_URL="https://script.google.com/macros/s/AKfycbzqd8yHDAKJ_lG5XTl-lqIa0yU43QDC_tdATiUogULoRbxd0dEnJXUKf2N-tO5kLnT2/exec?sheet=channels&action=read"
+          FILE_FORMAT="channels.json"
+          FILE_PATH="${GITHUB_WORKSPACE}/${FILE_FORMAT}"
+          
+          # Make API call and save response to a temporary file
+          CHANNELS_FILE=$(mktemp)
+          curl -sL "${CHANNELS_URL}" > "${CHANNELS_FILE}"
+
+          # Replace the contents of fateha.json with the temporary file
+          mv "${CHANNELS_FILE}" "${FILE_PATH}"
+
 
       - name: Commit and push changes with timestamp
         run: |
