@@ -64,7 +64,7 @@ jobs:
       - name: Call CTA Launcher API and store response in JSON file
         run: |
           # Replace the API_URL with your actual API endpoint
-          API_URL="https://script.google.com/macros/s/AKfycbyrh3wEuvmOlCu2iZaA393m8WMUZHc1555RqtQp6dg4GCy_xTA936tvhydSt864VblCJg/exec?sheet=deeplink&action=read"
+          API_URL="https://script.google.com/macros/s/AKfycbyrh3wEuvmOlCu2iZaA393m8WMUZHc1555RqtQp6dg4GCy_xTA936tvhydSt864VblCJg/exec?action=read&sheet=deeplink"
           FILE_FORMAT="deeplink.json"
           FILE_PATH="${GITHUB_WORKSPACE}/${FILE_FORMAT}"
 
@@ -95,6 +95,11 @@ jobs:
           # Check if there are changes to channels.json
           if [[ $(git diff --exit-code channels.json) ]]; then
             git add channels.json
+          fi
+
+           # Check if there are changes to channels.json
+          if [[ $(git diff --exit-code channels.json) ]]; then
+            git add deeplink.json
           fi
 
           # Check if there are changes to commit
