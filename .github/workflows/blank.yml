@@ -60,6 +60,21 @@ jobs:
           # Replace the contents of channels.json with the temporary file
           mv "${CHANNELS_FILE}" "${FILE_PATH}"
 
+          
+      - name: Call CTA Launcher API and store response in JSON file
+        run: |
+          # Replace the API_URL with your actual API endpoint
+          API_URL="https://script.google.com/macros/s/AKfycbyrh3wEuvmOlCu2iZaA393m8WMUZHc1555RqtQp6dg4GCy_xTA936tvhydSt864VblCJg/exec?sheet=deeplink&action=read"
+          FILE_FORMAT="deeplink.json"
+          FILE_PATH="${GITHUB_WORKSPACE}/${FILE_FORMAT}"
+
+          # Make API call and save response to a temporary file
+          TEMP_FILE=$(mktemp)
+          curl -sL "${API_URL}" > "${TEMP_FILE}"
+
+          # Replace the contents of response.json with the temporary file
+          mv "${TEMP_FILE}" "${FILE_PATH}"
+
       - name: Commit and push changes with timestamp
         run: |
           git config --global user.email "actions@github.com"
