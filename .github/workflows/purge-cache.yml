@@ -10,54 +10,21 @@ on:
       - completed  # Trigger when the referenced workflow completes successfully
 
 jobs:
-  purge-jsdelivr-cache:
+  purge-cdn-json-files:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout repository - alihusains/daa
         uses: actions/checkout@v3
         with:
-          # Fetch the whole repository history to ensure we have access to all branches/tags
-          fetch-depth: 0
+          repository: alihusains/daa
           ref: ${{ github.ref }}
 
-      - name: Determine CDN URLs to Purge
-        id: purge_urls
+      - name: Find JSON files and Purge CDN Cache
+        id: purge_json
         run: |
-          baseUrl="https://cdn.jsdelivr.net/gh/"
-          urls=""
-
-          # Check if 'daa' repository exists and locate .json files
-          if [ -d "alihusains/daa" ]; then
-            for f in $(find alihusains/daa -name "*.json" -type f); do
-              filePath="${f#alihusains/daa/}"
-              urls+="${baseUrl}alihusains/daa@latest/${filePath},"
-            done
-          fi
-
-          # Check if 'dnaa' repository exists and locate .db files
-          if [ -d "alihusains/dnaa" ]; then
-            for f in $(find alihusains/dnaa -name "*.db" -type f); do
-              filePath="${f#alihusains/dnaa/}"
-              urls+="${baseUrl}alihusains/dnaa@latest/${filePath},"
-            done
-          fi
-
-          # Check if 'stdb' repository exists and locate .db files
-          if [ -d "alihusains/stdb" ]; then
-            for f in $(find alihusains/stdb -name "*.db" -type f); do
-              filePath="${f#alihusains/stdb/}"
-              urls+="${baseUrl}alihusains/stdb@latest/${filePath},"
-            done
-          fi
-
-          if [ -n "$urls" ]; then
-            echo "urls=${urls%,*}" >> $GITHUB_ENV
-          else
-            echo "No URLs to purge."
-            exit 1
-          fi
-
-      - name: Purge CDN Caches
-        uses: egad13/purge-jsdelivr-cache@v1
-        with:
-          url: ${{ env.urls }}
+          baseUrl="https://cdn.jsdelivr.net/gh/alihusains/daa@latest/"
+          find . -name "*.json" -type f | while read file; do
+            filePath="${file#./}"
+            echo "Purging ${baseUrl}${filePath}"
+            curl -X PURGE "${baseUrl}${filePath}"
+          done
