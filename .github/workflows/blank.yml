@@ -62,7 +62,7 @@ jobs:
 
       - name: Call CTA Launcher API and store response in JSON file
         run: |
-          # Replace the API_URL with your actual API endpoint
+          # Replace the CTA_URL with your actual API endpoint
           CTA_URL="https://script.google.com/macros/s/AKfycbyrh3wEuvmOlCu2iZaA393m8WMUZHc1555RqtQp6dg4GCy_xTA936tvhydSt864VblCJg/exec?action=read&sheet=deeplink"
           FILE_FORMAT="deeplink.json"
           FILE_PATH="${GITHUB_WORKSPACE}/${FILE_FORMAT}"
@@ -71,7 +71,7 @@ jobs:
           TEMP_FILE=$(mktemp)
           curl -sL "${CTA_URL}" > "${TEMP_FILE}"
 
-          # Replace the contents of response.json with the temporary file
+          # Replace the contents of deeplink.json with the temporary file
           mv "${TEMP_FILE}" "${FILE_PATH}"
 
       - name: Commit and push changes with timestamp
@@ -123,14 +123,21 @@ jobs:
           for repo in "${repos[@]}"; do
             baseUrl="https://cdn.jsdelivr.net/gh/$repo@latest"
             for ext in "json" "db"; do
-              for f in `find dist -name "*.$ext" -type f`; do
-                urls+="${baseUrl}/${f},"
+              for f in `find dist -name "*.$ext" -type f 2>/dev/null`; do
+                # Strip the 'dist/' prefix from the file path
+                filePath="${f#dist/}"
+                urls+="${baseUrl}/${filePath},"
               done
             done
           done
-          echo "urls=${urls%,*}" >> $GITHUB_OUTPUT
+          if [ -n "$urls" ]; then
+            echo "urls=${urls%,*}" >> $GITHUB_ENV
+          else
+            echo "No URLs to purge."
+            exit 1
+          fi
 
       - name: Purge CDN Caches
         uses: egad13/purge-jsdelivr-cache@v1
         with:
-          url: ${{ steps.purge_urls.outputs.urls }}
+          url: ${{ env.urls }}
