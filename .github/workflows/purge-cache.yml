@@ -22,13 +22,13 @@ jobs:
       - name: Find and Log JSON files - alihusains/daa
         id: find_and_log_json_daa
         run: |
-          json_files=$(find . -name "*.json" -type f)
+          json_files=$(find . -name "response.json" -type f)
           if [ -n "$json_files" ]; then
             echo "::set-output name=found_json_files::${json_files}"
-            echo "Found JSON files:"
+            echo "Found response.json files:"
             echo "${json_files}"
           else
-            echo "No JSON files found."
+            echo "No response.json files found."
             exit 1
           fi
 
