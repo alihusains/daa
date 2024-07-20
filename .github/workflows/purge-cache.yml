@@ -25,7 +25,7 @@ jobs:
           json_files=$(find . -name "*.json" -type f)
           if [ -n "$json_files" ]; then
             echo "Found JSON files:"
-            echo "${json_files}"
+            echo "${json_files}" > json_files.txt  # Save JSON files to a file
           else
             echo "No JSON files found."
             exit 1
@@ -39,10 +39,8 @@ jobs:
           while IFS= read -r file; do
             file=${file#./}  # Remove leading './' from file path if present
             urls+="${baseUrl}/${file}\n"
-          done <<< "${json_files}"
-          echo "urls=${urls}" >> $GITHUB_ENV
-          echo "Purging CDN caches for URLs:"
-          echo -e "${urls}"  # Echo for debugging purposes
+          done < json_files.txt  # Read JSON files from the file
+          echo "::set-output name=urls::${urls}"
 
       - name: Purge CDN Caches
         uses: egad13/purge-jsdelivr-cache@v1
