@@ -16,6 +16,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
+          # Fetch the whole repository history to ensure we have access to all branches/tags
+          fetch-depth: 0
           ref: ${{ github.ref }}
 
       - name: Determine CDN URLs to Purge
@@ -23,29 +25,31 @@ jobs:
         run: |
           baseUrl="https://cdn.jsdelivr.net/gh/"
           urls=""
-          repos=(
-            "alihusains/daa"
-            "alihusains/dnaa"
-            "alihusains/stdb"
-            # Add more repositories as needed
-          )
-          for repo in "${repos[@]}"; do
-            # Check if 'database' folder exists in the repository
-            if [ -d "${repo}/database" ]; then
-              # Find .db files in the 'database' folder
-              for f in $(find "${repo}/database" -name "*.db" -type f); do
-                # Strip the '<repo>/' prefix from the file path
-                filePath="${f#${repo}/}"
-                urls+="${baseUrl}${repo}@latest/${filePath},"
-              done
-            fi
-            # Find .json files in the root of the repository
-            for f in $(find "${repo}" -maxdepth 1 -name "*.json" -type f); do
-              # Strip the '<repo>/' prefix from the file path
-              filePath="${f#${repo}/}"
-              urls+="${baseUrl}${repo}@latest/${filePath},"
+
+          # Check if 'daa' repository exists and locate .json files
+          if [ -d "alihusains/daa" ]; then
+            for f in $(find alihusains/daa -name "*.json" -type f); do
+              filePath="${f#alihusains/daa/}"
+              urls+="${baseUrl}alihusains/daa@latest/${filePath},"
             done
-          done
+          fi
+
+          # Check if 'dnaa' repository exists and locate .db files
+          if [ -d "alihusains/dnaa" ]; then
+            for f in $(find alihusains/dnaa -name "*.db" -type f); do
+              filePath="${f#alihusains/dnaa/}"
+              urls+="${baseUrl}alihusains/dnaa@latest/${filePath},"
+            done
+          fi
+
+          # Check if 'stdb' repository exists and locate .db files
+          if [ -d "alihusains/stdb" ]; then
+            for f in $(find alihusains/stdb -name "*.db" -type f); do
+              filePath="${f#alihusains/stdb/}"
+              urls+="${baseUrl}alihusains/stdb@latest/${filePath},"
+            done
+          fi
+
           if [ -n "$urls" ]; then
             echo "urls=${urls%,*}" >> $GITHUB_ENV
           else
