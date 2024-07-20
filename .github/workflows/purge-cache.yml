@@ -42,7 +42,7 @@ jobs:
             urls+="${baseUrl}/${file},"
           done
           urls="${urls%,}"  # Remove trailing comma
-          echo urls
+          echo ${urls}
           echo "urls=${urls}" >> $GITHUB_ENV
 
       - name: Purge CDN Caches
