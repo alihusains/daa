@@ -19,15 +19,10 @@ jobs:
           repository: alihusains/daa
           ref: ${{ github.ref }}
 
-      - name: Find JSON files and Log - alihusains/daa
+      - name: Find and Log JSON files - alihusains/daa
         id: find_and_log_json_daa
         run: |
-          baseUrl="https://cdn.jsdelivr.net/gh/alihusains/daa@latest/"
-          json_files=""
-          find . -name "*.json" -type f | while read file; do
-            filePath="${file#./}"
-            json_files+="${filePath}\n"
-          done
+          json_files=$(find . -name "*.json" -type f)
           if [ -n "$json_files" ]; then
             echo "::set-output name=found_json_files::${json_files}"
             echo "Found JSON files:"
@@ -41,7 +36,7 @@ jobs:
         if: success() && steps.find_and_log_json_daa.outputs.found_json_files
         run: |
           urls=""
-          for file in ${{ steps.find_and_log_json_daa.outputs.found_json_files }}; do
+          for file in "${{ steps.find_and_log_json_daa.outputs.found_json_files }}"; do
             urls+="https://cdn.jsdelivr.net/gh/alihusains/daa@latest/${file},"
           done
           urls="${urls%,}"
