@@ -24,9 +24,9 @@ jobs:
         run: |
           json_files=$(find . -name "*.json" -type f)
           if [ -n "$json_files" ]; then
-            echo "::set-output name=found_json_files::${json_files}"
             echo "Found JSON files:"
             echo "${json_files}"
+            echo "::set-env name=JSON_FILES::${json_files}"  # Store files in environment for subsequent steps
           else
             echo "No JSON files found."
             exit 1
@@ -37,13 +37,18 @@ jobs:
         run: |
           baseUrl="https://cdn.jsdelivr.net/gh/alihusains/daa@latest"
           urls=""
-          for file in ${{ steps.find_and_log_json_daa.outputs.found_json_files }}; do
+          for file in $JSON_FILES; do
             file=${file#./}  # Remove leading './' from file path if present
             urls+="${baseUrl}/${file},"
           done
           urls="${urls%,}"  # Remove trailing comma
           echo "urls=${urls}" >> $GITHUB_ENV
-          echo "::set-output name=urls::${urls}"  # Set as output for debugging
+          echo "Purging CDN caches for URLs:"
+          echo "${urls}"
+          echo "::set-output name=urls::${urls}"  # Set as output for the next steps
+
+
+          
 
       - name: Purge CDN Caches
         uses: egad13/purge-jsdelivr-cache@v1
