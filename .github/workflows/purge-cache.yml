@@ -12,7 +12,6 @@ on:
 jobs:
   purge-jsdelivr-cache:
     runs-on: ubuntu-20.04
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -22,21 +21,12 @@ jobs:
       - name: Determine CDN URLs to Purge
         id: purge_urls
         run: |
-          repos=(
-            "alihusains/daa"
-            "alihusains/dnaa"
-            "alihusains/stdb"
-          )
+          baseUrl="https://cdn.jsdelivr.net/gh/${{ github.repository }}@latest"
           urls=""
-          for repo in "${repos[@]}"; do
-            baseUrl="https://cdn.jsdelivr.net/gh/$repo@latest"
-            for ext in "json" "db"; do
-              for f in $(find dist -name "*.$ext" -type f 2>/dev/null); do
-                # Strip the 'dist/' prefix from the file path
-                filePath="${f#dist/}"
-                urls+="${baseUrl}/${filePath},"
-              done
-            done
+          for f in $(find dist -name "*.json" -type f); do
+            # Strip the 'dist/' prefix from the file path
+            filePath="${f#dist/}"
+            urls+="${baseUrl}/${filePath},"
           done
           if [ -n "$urls" ]; then
             echo "urls=${urls%,*}" >> $GITHUB_ENV
