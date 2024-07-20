@@ -37,6 +37,8 @@ jobs:
         run: |
           urls=""
           for file in ${{ steps.find_and_log_json_daa.outputs.found_json_files }}; do
+            # Remove leading './' from file path if present
+            file=${file#./}
             urls+="https://cdn.jsdelivr.net/gh/alihusains/daa@latest/${file},"
           done
           urls="${urls%,}"
