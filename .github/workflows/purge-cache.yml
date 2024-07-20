@@ -42,7 +42,7 @@ jobs:
           done <<< "${json_files}"
           echo "urls=${urls}" >> $GITHUB_ENV
           echo "Purging CDN caches for URLs:"
-          echo -e "${urls}"
+          echo -e "${urls}"  # Echo for debugging purposes
 
       - name: Purge CDN Caches
         uses: egad13/purge-jsdelivr-cache@v1
