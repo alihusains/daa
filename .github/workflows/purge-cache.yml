@@ -42,6 +42,6 @@ jobs:
           echo "::set-output name=urls::${urls}"
 
       - name: Purge CDN Caches
-        uses: egad13/purge-jsdelivr-cache@v1
+        uses: egad13/purge-jsdelivr-cache@v1.1.0
         with:
           url: ${{ steps.purge_urls.outputs.urls }}
