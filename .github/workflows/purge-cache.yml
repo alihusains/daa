@@ -11,7 +11,7 @@ on:
 
 jobs:
   purge-jsdelivr-cache:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -21,12 +21,30 @@ jobs:
       - name: Determine CDN URLs to Purge
         id: purge_urls
         run: |
-          baseUrl="https://cdn.jsdelivr.net/gh/${{ github.repository }}@latest"
+          baseUrl="https://cdn.jsdelivr.net/gh/"
           urls=""
-          for f in $(find dist -name "*.json" -type f); do
-            # Strip the 'dist/' prefix from the file path
-            filePath="${f#dist/}"
-            urls+="${baseUrl}/${filePath},"
+          repos=(
+            "alihusains/daa"
+            "alihusains/dnaa"
+            "alihusains/stdb"
+            # Add more repositories as needed
+          )
+          for repo in "${repos[@]}"; do
+            # Check if 'database' folder exists in the repository
+            if [ -d "${repo}/database" ]; then
+              # Find .db files in the 'database' folder
+              for f in $(find "${repo}/database" -name "*.db" -type f); do
+                # Strip the '<repo>/' prefix from the file path
+                filePath="${f#${repo}/}"
+                urls+="${baseUrl}${repo}@latest/${filePath},"
+              done
+            fi
+            # Find .json files in the root of the repository
+            for f in $(find "${repo}" -maxdepth 1 -name "*.json" -type f); do
+              # Strip the '<repo>/' prefix from the file path
+              filePath="${f#${repo}/}"
+              urls+="${baseUrl}${repo}@latest/${filePath},"
+            done
           done
           if [ -n "$urls" ]; then
             echo "urls=${urls%,*}" >> $GITHUB_ENV
