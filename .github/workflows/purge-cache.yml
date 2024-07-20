@@ -42,10 +42,10 @@ jobs:
             urls+="${baseUrl}/${file},"
           done
           urls="${urls%,}"  # Remove trailing comma
-          echo ${urls}
           echo "urls=${urls}" >> $GITHUB_ENV
+          echo "::set-output name=urls::${urls}"  # Set as output for debugging
 
       - name: Purge CDN Caches
         uses: egad13/purge-jsdelivr-cache@v1
         with:
-          url: ${{ env.urls }}
+          url: ${{ steps.purge_urls.outputs.urls }}
