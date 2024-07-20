@@ -38,8 +38,9 @@ jobs:
           urls=""
           while IFS= read -r file; do
             file=${file#./}  # Remove leading './' from file path if present
-            urls+="${baseUrl}/${file}\n"
+            urls+="${baseUrl}/${file},"
           done < json_files.txt  # Read JSON files from the file
+          urls="${urls%,}"  # Remove trailing comma
           echo "::set-output name=urls::${urls}"
 
       - name: Purge CDN Caches
