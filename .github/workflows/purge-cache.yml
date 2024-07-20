@@ -1,8 +1,6 @@
-name: Purge CDN Cache - daa
+name: Purge
 
 on:
-  schedule:
-    - cron: '*/15 * * * *'  # Run every 15 mins
   workflow_dispatch:  # Allow manual triggers
   workflow_run:
     workflows: ["blank.yml"]  # Name of the workflow to depend on
