@@ -33,4 +33,4 @@ jobs:
       - name: Purge CDN Caches - alihusains/daa
         uses: egad13/purge-jsdelivr-cache@v1
         with:
-          url: ${{ env.urls }}
+          url: ${{ steps.purge_json_daa.outputs.urls }}
