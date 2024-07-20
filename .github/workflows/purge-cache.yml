@@ -32,22 +32,19 @@ jobs:
             exit 1
           fi
 
-      - name: Purge CDN Caches - alihusains/daa
-        if: success() && steps.find_and_log_json_daa.outputs.found_json_files
+      - name: Determine CDN URLs to Purge
+        id: purge_urls
         run: |
+          baseUrl="https://cdn.jsdelivr.net/gh/alihusains/daa@latest"
           urls=""
           for file in ${{ steps.find_and_log_json_daa.outputs.found_json_files }}; do
-            # Remove leading './' from file path if present
-            file=${file#./}
-            urls+="https://cdn.jsdelivr.net/gh/alihusains/daa@latest/${file},"
+            file=${file#./}  # Remove leading './' from file path if present
+            urls+="${baseUrl}/${file},"
           done
-          urls="${urls%,}"
+          urls="${urls%,}"  # Remove trailing comma
           echo "urls=${urls}" >> $GITHUB_ENV
 
-          echo "Purging CDN caches..."
-          echo "urls=${urls}"
-
-          # Use the purge-jsdelivr-cache action with the collected URLs
-          uses: egad13/purge-jsdelivr-cache@v1
-          with:
-            url: ${{ env.urls }}
+      - name: Purge CDN Caches
+        uses: egad13/purge-jsdelivr-cache@v1
+        with:
+          url: ${{ env.urls }}
