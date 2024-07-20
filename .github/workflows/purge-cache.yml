@@ -1,10 +1,12 @@
 name: Purge CDN Cache
 
 on:
+  schedule:
+    - cron: '*/15 * * * *'  # Run every 15 mins
   workflow_run:
-    workflows: ["blank"]
+    workflows: ["blank.yml"]  # Name of the workflow to depend on
     types:
-      - completed
+      - completed  # Trigger when the referenced workflow completes successfully
 
 jobs:
   purge-jsdelivr-cache:
