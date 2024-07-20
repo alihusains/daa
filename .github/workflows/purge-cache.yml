@@ -1,4 +1,4 @@
-name: Purge CDN Cache
+name: Purge CDN Cache - daa
 
 on:
   schedule:
@@ -19,18 +19,34 @@ jobs:
           repository: alihusains/daa
           ref: ${{ github.ref }}
 
-      - name: Find JSON files and Purge CDN Cache - alihusains/daa
-        id: purge_json_daa
+      - name: Find JSON files and Log - alihusains/daa
+        id: find_and_log_json_daa
         run: |
           baseUrl="https://cdn.jsdelivr.net/gh/alihusains/daa@latest/"
-          urls=""
+          json_files=""
           find . -name "*.json" -type f | while read file; do
             filePath="${file#./}"
-            urls+="${baseUrl}${filePath},"
+            json_files+="${filePath}\n"
           done
-          echo "urls=${urls%,*}" >> $GITHUB_ENV
+          if [ -n "$json_files" ]; then
+            echo "::set-output name=found_json_files::${json_files}"
+            echo "Found JSON files:"
+            echo "${json_files}"
+          else
+            echo "No JSON files found."
+            exit 1
+          fi
 
       - name: Purge CDN Caches - alihusains/daa
-        uses: egad13/purge-jsdelivr-cache@v1
-        with:
-          url: ${{ steps.purge_json_daa.outputs.urls }}
+        if: success() && steps.find_and_log_json_daa.outputs.found_json_files
+        run: |
+          urls=""
+          for file in ${{ steps.find_and_log_json_daa.outputs.found_json_files }}; do
+            urls+="https://cdn.jsdelivr.net/gh/alihusains/daa@latest/${file},"
+          done
+          urls="${urls%,}"
+          echo "urls=${urls}" >> $GITHUB_ENV
+
+          uses: egad13/purge-jsdelivr-cache@v1
+          with:
+            url: ${{ env.urls }}
