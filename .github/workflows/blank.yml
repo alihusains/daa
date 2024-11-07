@@ -63,8 +63,8 @@ jobs:
       - name: Call CTA Launcher API and store response in JSON file
         run: |
           # Replace the CTA_URL with your actual API endpoint
-          CTA_URL="https://script.google.com/macros/s/AKfycbyrh3wEuvmOlCu2iZaA393m8WMUZHc1555RqtQp6dg4GCy_xTA936tvhydSt864VblCJg/exec?action=read&sheet=deeplink"
-          FILE_FORMAT="deeplink.json"
+          CTA_URL="https://script.google.com/macros/s/AKfycbzqd8yHDAKJ_lG5XTl-lqIa0yU43QDC_tdATiUogULoRbxd0dEnJXUKf2N-tO5kLnT2/exec?action=read&sheet=hadith"
+          FILE_FORMAT="hadith.json"
           FILE_PATH="${GITHUB_WORKSPACE}/${FILE_FORMAT}"
 
           # Make API call and save response to a temporary file
