@@ -1,0 +1,56 @@
+name: Purge Entire Repository CDN Cache
+
+on:
+  workflow_dispatch:  # Allow manual triggers
+  # workflow_run:
+    # workflows: ["blank.yml"]  # Trigger after this workflow completes
+    # types: [completed]
+
+jobs:
+  purge-cdn-cache:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: alihusains/daa
+          ref: ${{ github.ref }}
+
+      - name: Find all repository files
+        id: find_all_files
+        run: |
+          all_files=$(find . -type f ! -path "./.git/*")
+          if [ -n "$all_files" ]; then
+            echo "Found repository files:"
+            echo "$all_files"
+            echo "$all_files" > all_files.txt
+          else
+            echo "No files found in repository."
+            exit 1
+          fi
+
+      - name: Generate CDN URLs for all files
+        id: generate_urls
+        run: |
+          base_urls=(
+            "https://cdn.jsdelivr.net/gh/alihusains/dnaa@latest"
+            "https://cdn.jsdelivr.net/gh/alihusains/dnaa@main"
+          )
+          urls=""
+          while IFS= read -r file; do
+            file=${file#./}
+            for base in "${base_urls[@]}"; do
+              urls+="${base}/${file},"
+            done
+          done < all_files.txt
+          urls="${urls%,}"  # Remove trailing comma
+          echo "Generated URLs for purge:"
+          echo "$urls"
+          echo "urls=$urls" >> $GITHUB_OUTPUT
+
+      - name: Purge CDN caches
+        if: ${{ steps.generate_urls.outputs.urls != '' }}
+        uses: egad13/purge-jsdelivr-cache@v1.1.0
+        with:
+          url: ${{ steps.generate_urls.outputs.urls }}
